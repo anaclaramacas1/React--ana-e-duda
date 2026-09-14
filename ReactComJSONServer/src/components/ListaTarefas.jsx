@@ -1,40 +1,65 @@
-function ListaTarefas({ tarefas, onExcluir, onAlterar }) {
-  if (tarefas.length === 0) {
-    return <p>Nenhuma tarefa cadastrada.</p>;
+function ListaTarefas({
+  produtos,
+  onExcluir,
+  onEditar
+}) {
+  if (produtos.length === 0) {
+    return (
+      <p>
+        Nenhum produto cadastrado.
+      </p>
+    );
   }
 
   return (
     <section className="lista">
-      {tarefas.map((tarefa) => (
-        <article className="tarefa" key={tarefa.id}>
+
+      {produtos.map((produto) => (
+
+        <article
+          className="tarefa"
+          key={produto.id}
+        >
+
           <div>
-            <h2 className={tarefa.concluida ? "concluida" : ""}>
-              {tarefa.titulo}
+
+            <h2>
+              {produto.nome}
             </h2>
 
             <span>
-              {tarefa.concluida ? "Concluída" : "Pendente"}
+              R$ {Number(produto.preco).toFixed(2).replace(".", ",")}
             </span>
+
           </div>
 
           <div className="acoes">
+
             <button
               type="button"
-              onClick={() => onAlterar(tarefa)}
+              onClick={() =>
+                onEditar(produto)
+              }
             >
-              {tarefa.concluida ? "Reabrir" : "Concluir"}
+              Editar
             </button>
 
             <button
               type="button"
               className="botao-excluir"
-              onClick={() => onExcluir(tarefa.id)}
+              onClick={() =>
+                onExcluir(produto.id)
+              }
             >
               Excluir
             </button>
+
           </div>
+
         </article>
+
       ))}
+
     </section>
   );
 }

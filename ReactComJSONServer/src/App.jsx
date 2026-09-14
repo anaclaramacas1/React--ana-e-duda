@@ -1,149 +1,173 @@
 import { useEffect, useState } from "react";
+
 import FormTarefa from "./components/FormTarefa.jsx";
 import ListaTarefas from "./components/ListaTarefas.jsx";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 
 import {
-  buscarTarefas,
-  criarTarefa,
-  excluirTarefa,
-  atualizarStatus
+  buscarProdutos,
+  criarProduto,
+  excluirProduto,
+  atualizarProduto
 } from "./services/tarefaService.js";
 
 function App() {
-  const [tarefas, setTarefas] = useState([]);
+  const [produtos, setProdutos] = useState([]);
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(true);
 
+
   useEffect(() => {
-    carregarTarefas();
+    carregarProdutos();
   }, []);
 
-  async function carregarTarefas() {
+  async function carregarProdutos() {
     try {
       setCarregando(true);
       setErro("");
 
-      const dados = await buscarTarefas();
-      setTarefas(dados);
+      const dados = await buscarProdutos();
+
+      setProdutos(dados);
     } catch (error) {
       console.error(error);
+
       setErro(
-        "Não foi possível carregar as tarefas. Verifique se o JSON Server está rodando."
+        "Não foi possível carregar os produtos. Verifique se o servidor está rodando."
       );
     } finally {
       setCarregando(false);
     }
   }
 
-  async function adicionarTarefa(titulo) {
+
+
+  async function adicionarProduto(nome, preco) {
     try {
       setErro("");
 
-      const novaTarefa = await criarTarefa({
-        titulo: titulo,
-        concluida: false
+      await criarProduto({
+        nome: nome,
+        preco: Number(preco)
       });
 
-      setTarefas((listaAtual) => [...listaAtual, novaTarefa]);
+      await carregarProdutos();
     } catch (error) {
       console.error(error);
-      setErro("Não foi possível cadastrar a tarefa.");
+
+      setErro("Não foi possível cadastrar o produto.");
     }
   }
 
-  async function removerTarefa(id) {
-
-  
-  const confirmar = window.confirm(
-    "Tem certeza que deseja excluir esta tarefa?"
-  );
-
  
-  if (!confirmar) {
-    return;
-  }
 
-  try {
-
-    setErro("");
-
-    await excluirTarefa(id);
-
-    setTarefas((listaAtual) =>
-      listaAtual.filter(
-        (tarefa) => tarefa.id !== id
-      )
+  async function removerProduto(id) {
+    const confirmar = window.confirm(
+      "Tem certeza que deseja excluir este produto?"
     );
 
-  } catch (error) {
+    if (!confirmar) {
+      return;
+    }
 
-    console.error(error);
-
-    setErro("Não foi possível excluir a tarefa.");
-
-  }
-
-}
-
-  async function alterarTarefa(tarefa) {
     try {
       setErro("");
 
-      const tarefaAtualizada = await atualizarStatus(
-        tarefa.id,
-        !tarefa.concluida
-      );
+      await excluirProduto(id);
 
-      setTarefas((listaAtual) =>
-        listaAtual.map((item) =>
-          item.id === tarefa.id ? tarefaAtualizada : item
-        )
-      );
+      await carregarProdutos();
     } catch (error) {
       console.error(error);
-      setErro("Não foi possível alterar a tarefa.");
+
+      setErro("Não foi possível excluir o produto.");
+    }
+  }
+
+
+
+  async function editarProduto(produto) {
+    const novoNome = window.prompt(
+      "Digite o novo nome do produto:",
+      produto.nome
+    );
+
+    if (novoNome === null) {
+      return;
+    }
+
+    const novoPreco = window.prompt(
+      "Digite o novo preço:",
+      produto.preco
+    );
+
+    if (novoPreco === null) {
+      return;
+    }
+
+    if (!novoNome.trim() || novoPreco === "") {
+      alert("Preencha todos os campos.");
+      return;
+    }
+
+    try {
+      setErro("");
+
+      await atualizarProduto(produto.id, {
+        nome: novoNome.trim(),
+        preco: Number(novoPreco)
+      });
+
+      await carregarProdutos();
+    } catch (error) {
+      console.error(error);
+
+      setErro("Não foi possível atualizar o produto.");
     }
   }
 
   return (
-  <>
-    <Header />
+    <>
+      <Header />
 
-    <main className="container">
+      <main className="container">
 
-      <section className="apresentacao">
-        <h1>Gerenciador de Tarefas</h1>
+        <section className="apresentacao">
 
-        <p>
-          React consumindo uma API simulada com JSON Server
-        </p>
-      </section>
+          <h1>Gerenciador de Produtos</h1>
 
-      <FormTarefa onAdicionar={adicionarTarefa} />
+          <p>
+            React consumindo a API de Produtos
+            (Node + Express + MySQL)
+          </p>
 
-      {erro && (
-        <p className="erro">
-          {erro}
-        </p>
-      )}
+        </section>
 
-      {carregando ? (
-        <p>Carregando...</p>
-      ) : (
-        <ListaTarefas
-          tarefas={tarefas}
-          onExcluir={removerTarefa}
-          onAlterar={alterarTarefa}
+        <FormTarefa
+          onAdicionar={adicionarProduto}
         />
-      )}
 
-    </main>
+        {erro && (
+          <p className="erro">
+            {erro}
+          </p>
+        )}
 
-    <Footer />
-  </>
-);
+        {carregando ? (
+          <p>Carregando...</p>
+        ) : (
+          <ListaTarefas
+            produtos={produtos}
+            onExcluir={removerProduto}
+            onEditar={editarProduto}
+          />
+        )}
+
+      </main>
+
+      <Footer />
+    </>
+  );
 }
 
 export default App;

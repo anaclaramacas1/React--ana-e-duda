@@ -1,5 +1,4 @@
 function Footer() {
-
   const ano = new Date().getFullYear();
 
   return (

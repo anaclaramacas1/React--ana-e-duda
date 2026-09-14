@@ -1,11 +1,12 @@
 function Header() {
   return (
     <header className="topo">
+
       <div className="topo-conteudo">
 
         <div className="logo">
           <span>&lt;/&gt;</span>
-          DEV TASKS
+          DEV PRODUTOS
         </div>
 
         <div className="topo-texto">
@@ -13,6 +14,7 @@ function Header() {
         </div>
 
       </div>
+
     </header>
   );
 }

@@ -1,31 +1,51 @@
 import { useState } from "react";
 
 function FormTarefa({ onAdicionar }) {
-  const [titulo, setTitulo] = useState("");
+  const [nome, setNome] = useState("");
+  const [preco, setPreco] = useState("");
 
   function enviar(event) {
     event.preventDefault();
 
-    const tituloLimpo = titulo.trim();
+    const nomeLimpo = nome.trim();
 
-    if (!tituloLimpo) {
+    if (!nomeLimpo || preco === "") {
       return;
     }
 
-    onAdicionar(tituloLimpo);
-    setTitulo("");
+    onAdicionar(nomeLimpo, preco);
+
+    setNome("");
+    setPreco("");
   }
 
   return (
-    <form className="formulario" onSubmit={enviar}>
+    <form
+      className="formulario"
+      onSubmit={enviar}
+    >
       <input
         type="text"
-        placeholder="Digite uma tarefa"
-        value={titulo}
-        onChange={(event) => setTitulo(event.target.value)}
+        placeholder="Nome"
+        value={nome}
+        onChange={(event) =>
+          setNome(event.target.value)
+        }
       />
 
-      <button type="submit">Adicionar</button>
+      <input
+        type="number"
+        step="0.01"
+        placeholder="Preço"
+        value={preco}
+        onChange={(event) =>
+          setPreco(event.target.value)
+        }
+      />
+
+      <button type="submit">
+        Adicionar
+      </button>
     </form>
   );
 }
